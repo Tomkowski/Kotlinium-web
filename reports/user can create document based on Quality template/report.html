@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>user can create document based on Quality template</title>
+</head>
+<script>
+    function init() {
+        let cases = document.getElementsByTagName("a");
+
+        function capitalise(string) {
+            return string[0].toUpperCase() + string.slice(1).split("[")[0]
+        }
+
+        for (let i = 0; i < cases.length; i++) {
+            let text = cases[i].innerText;
+            if(text == null || text === "") continue;
+            cases[i].firstChild.data = capitalise(text)
+        }
+    }
+</script>
+<style>
+
+    .titlediv {
+        text-align: center;
+        border: 3px solid black;
+        border-top-right-radius: 25px;
+        border-top-left-radius: 25px;
+        background-color: #008CBA;
+        padding-top: 25px;
+        padding-bottom: 25px;
+        font-size: 24px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .jira a {
+        color: #FFF;
+    }
+
+    .jira {
+        padding: 20px;
+        margin: 20px 20px 20px 20px;
+        background-color: cadetblue;
+        border-radius: 4px;
+        display: inline-block;
+        color: #FFFFFF;
+    }
+
+    .jira:hover {
+        box-shadow: 0 0 4px 1px #FFF;
+        cursor: pointer;
+    }
+
+    img {
+        border: 1px solid #ddd; /* Gray border */
+        border-radius: 4px; /* Rounded border */
+        padding: 5px; /* Some padding */
+        width: 150px; /* Set a small width */
+    }
+
+    img:hover {
+        box-shadow: 0 0 3px 2px rgba(0, 140, 186, 0.5);
+    }
+
+    li a {
+        outline: 0;
+        border: none;
+        text-decoration: none;
+        margin: 10px;
+        color: #000000;
+        width: 100%;
+        display: inline-block;
+    }
+
+    a img {
+        float: right;
+        margin-right: 20px;
+    }
+
+    li {
+        border-radius: 2px;
+        background: #bfbbbf;
+        border-width: 1px;
+        border-style: solid;
+        border-color: #800000;
+        margin-bottom: 10px;
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
+
+ol {
+  counter-reset: my-awesome-counter;
+  list-style: none;
+  padding-left: 40px;
+}
+ol li {
+  margin: 0 0 0.5rem 0;
+  counter-increment: my-awesome-counter;
+  position: relative;
+}
+ol li::before {
+  content: counter(my-awesome-counter);
+  color: #fcd000;
+  font-size: 1.5rem;
+  font-weight: bold;
+  position: absolute;
+  --size: 32px;
+  left: calc(-1 * var(--size) - 10px);
+  line-height: var(--size);
+  width: var(--size);
+  height: var(--size);
+  top: 0;
+  background: #008CBA;
+  border-radius: 50%;
+  text-align: center;
+  box-shadow: 1px 1px 0 #999;
+}
+
+body {
+  background: #eee;
+  color: #000;
+  font-family: Roboto, sans-serif;
+  line-height: 1.4;
+  font-size: 90%;
+  margin: 2rem;
+}
+</style>
+
+<body onload="init()" style="width:90%; margin: 10px auto">
+
+<div class="titlediv">
+    <div class="jira" onclick="window.open('https://jira.roche.com/jira/browse/No Jira ID specified')">
+        <a>No Jira ID specified</a>
+    </div>
+    <a style="color:#FFFFFF; flex:3">User can create Module 1 Document from Quality template</a>
+</div>
+<ol>
+    <li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                fill credentials of user <span style="color: #164694">[idmt05]</span>
+            </a>
+            <a href='fill credentials of user20210629114639-0.png'>
+                <img src='fill credentials of user20210629114639-0.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:40.008)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                press Login button <span style="color: #164694"></span>
+            </a>
+            <a href='press Login button20210629114649-1.png'>
+                <img src='press Login button20210629114649-1.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:50.033)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                accept disclaimer <span style="color: #164694"></span>
+            </a>
+            <a href='accept disclaimer20210629114652-2.png'>
+                <img src='accept disclaimer20210629114652-2.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:52.481)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                press Create button <span style="color: #164694"></span>
+            </a>
+            <a href='press Create button20210629114652-3.png'>
+                <img src='press Create button20210629114652-3.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:52.732)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                open Search Document Types <span style="color: #164694"></span>
+            </a>
+            <a href='open Search Document Types20210629114652-4.png'>
+                <img src='open Search Document Types20210629114652-4.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:52.981)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                open All Document Types <span style="color: #164694"></span>
+            </a>
+            <a href='open All Document Types20210629114653-5.png'>
+                <img src='open All Document Types20210629114653-5.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:53.216)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                select domain <span style="color: #164694">[Pharmacovigilance]</span>
+            </a>
+            <a href='select domain20210629114653-6.png'>
+                <img src='select domain20210629114653-6.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:53.861)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                select domain <span style="color: #164694">[Safety Communications]</span>
+            </a>
+            <a href='select domain20210629114654-7.png'>
+                <img src='select domain20210629114654-7.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:54.280)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                select domain <span style="color: #164694">[Safety Communications Compound]</span>
+            </a>
+            <a href='select domain20210629114654-8.png'>
+                <img src='select domain20210629114654-8.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:54.738)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                select All Document Types template <span style="color: #164694">[DHPC Letter]</span>
+            </a>
+            <a href='select All Document Types template20210629114659-9.png'>
+                <img src='select All Document Types template20210629114659-9.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:46:59.891)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                fill property <span style="color: #164694">[Doc Type Decision Date] [22 Jul 2025]</span>
+            </a>
+            <a href='fill property20210629114700-10.png'>
+                <img src='fill property20210629114700-10.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:47:00.261)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                fill property <span style="color: #164694">[Product] [alec]</span>
+            </a>
+            <a href='fill property20210629114701-11.png'>
+                <img src='fill property20210629114701-11.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:47:02.068)</a>
+     </div>
+
+</li>
+<li> 
+    <div style="display: flex; align-items: center; justify-content: space-between">
+            <a style="height: 100%; padding-left: 10px;">
+                fill mandatory properties <span style="color: #164694"></span>
+            </a>
+            <a href='fill mandatory properties20210629114703-12.png'>
+                <img src='fill mandatory properties20210629114703-12.png'/>
+            </a>
+
+        </div>
+        <div>
+            <a style="font-size: 12px">(Jun-29-2021 11:47:03.936)</a>
+     </div>
+
+</li>
+</ol>
+
+<a></a>
+</body>
+</html>
