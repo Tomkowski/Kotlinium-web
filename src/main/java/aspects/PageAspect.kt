@@ -1,5 +1,6 @@
 package aspects
 
+import model.TestStepReport
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.After
 import org.aspectj.lang.annotation.Aspect
@@ -12,11 +13,12 @@ import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-
+import kotlin.collections.ArrayList
 
 
 // Added to screenshot name to avoid screenshot name duplication
 private var counter = 0L
+
 /**
  * @param testName - name of the Test Set
  * @param stepName - name of currently finished step
@@ -37,7 +39,7 @@ private fun getScreenshot(testName: String, stepName: String): String {
 }
 
 //list of <li> rows representing each step
-val testCaseSteps = mutableListOf<String>()
+val testCaseSteps = mutableListOf<TestStepReport>()
 
 @Aspect
 class PageAspect {
@@ -47,40 +49,19 @@ class PageAspect {
      */
     @After("execution(void pages.*.*(..))")
     fun collectTest(joinPoint: JoinPoint) {
-        if(!isInvokedByTestCase()) return
+        if (!isInvokedByTestCase()) return
 
         val stepName = joinPoint.signature.name
         val methodArgs = joinPoint.args
-        val stepParameters = if(methodArgs.isEmpty()) "" else methodArgs.joinToString(" "){ "[$it]" }
         val screenshotPath = getScreenshot(watcher.methodName, stepName)
-        val timestamp = LocalDateTime.now()
-            .format(DateTimeFormatter.ofPattern("MMM-dd-yyyy HH:mm:ss.SSS"))
+        val timestamp = System.currentTimeMillis()
 
-        fun buildElement(): String {
-            return """
-                <li> 
-                    <div style="display: flex; align-items: center; justify-content: space-between">
-                            <a style="height: 100%; padding-left: 10px;">
-                                $stepName <span style="color: #164694">$stepParameters</span>
-                            </a>
-                            <a href='$screenshotPath'>
-                                <img src='$screenshotPath'/>
-                            </a>
-
-                        </div>
-                        <div>
-                            <a style="font-size: 12px">($timestamp)</a>
-                     </div>
-
-                </li>
-            """.trimIndent()
-        }
-        testCaseSteps.add(buildElement())
+        testCaseSteps.add(TestStepReport(stepName, methodArgs.map { it.toString() }, screenshotPath, timestamp))
     }
 }
 
 //Check if object invoking Test Step was in 'tests' package
 // 0 for this function, 1 for PageAspect check, 2 for a calling function (test step), 3 for a caller
-fun isInvokedByTestCase(): Boolean{
+fun isInvokedByTestCase(): Boolean {
     return "${Exception().stackTrace[3]}".startsWith("tests")
 }

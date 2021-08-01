@@ -1,6 +1,7 @@
 package tools
 
 import pages.CreateNewDocumentPage
+import pages.GooglePage
 import pages.LoginPage
 import pages.MyDocumentsPage
 
@@ -14,4 +15,8 @@ fun myDocuments(func: MyDocumentsPage.() -> Unit){
 
 fun createNewDocument(func: CreateNewDocumentPage.() -> Unit){
     CreateNewDocumentPage().func()
+}
+
+fun googlePage(func: GooglePage.() -> Unit){
+    GooglePage().func()
 }
