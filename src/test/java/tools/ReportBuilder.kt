@@ -1,24 +1,15 @@
 package tools
 
-import aspects.testCaseSteps
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.sun.xml.internal.ws.api.ha.StickyFeature
 import model.TestCaseReport
 import model.TestStepReport
 import java.io.File
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 object ReportBuilder {
-
-    private val jsonReport = File("./reports/DemoSet.json")
-    private val listType = object : TypeToken<ArrayList<TestCaseReport?>?>() {}.type
-    private val reportsList = Gson().fromJson<List<TestCaseReport>>(jsonReport.readText(), listType)
 
     private fun buildStepReport(testStepReport: TestStepReport): String {
 
@@ -26,7 +17,7 @@ object ReportBuilder {
             with(testStepReport) {
                 val formattedParameters = stepParameters.joinToString(" ") { "[$it]" }
                 val formattedTimestamp =
-                    SimpleDateFormat("MMM-dd-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(timestamp) ?: ""
+                        SimpleDateFormat("MMM-dd-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(timestamp) ?: ""
                 return """
                 <li> 
                     <div style="display: flex; align-items: center; justify-content: space-between">
@@ -58,10 +49,10 @@ object ReportBuilder {
 
             reportSummary.readText().apply {
                 val refactor = replace("%title%", testCaseName)
-                    .replace("%jiraticket%", jiraID)
-                    .replace("%description%", description)
-                    .replace("%report%", stepsList.joinToString(separator = "\n") { buildStepReport(it) })
-                    .replace("%stacktrace%", stackTrace)
+                        .replace("%jiraticket%", jiraID)
+                        .replace("%description%", description)
+                        .replace("%report%", stepsList.joinToString(separator = "\n") { buildStepReport(it) })
+                        .replace("%stacktrace%", stackTrace)
 
                 reportSummary.writeText(refactor)
             }
@@ -69,13 +60,17 @@ object ReportBuilder {
     }
 
     fun generateReportSummary(testSetName: String) {
+        val jsonReport = File("./reports/$testSetName.json")
+        val listType = object : TypeToken<ArrayList<TestCaseReport?>?>() {}.type
+        val reportsList = Gson().fromJson<List<TestCaseReport>>(jsonReport.readText(), listType)
+
         val summaryTemplate = File("./src/test/resources/summaryTemplate.html")
         val reportSummary = File("./reports/$testSetName.html").apply { delete() }
         summaryTemplate.copyTo(reportSummary)
 
         reportSummary.readText().apply {
             val refactor = replace("%title%", testSetName)
-                .replace("%summary%", reportsList.joinToString(separator = "\n") { buildSummaryTestCaseRow(it) })
+                    .replace("%summary%", reportsList.joinToString(separator = "\n") { buildSummaryTestCaseRow(it) })
             reportSummary.writeText(refactor)
         }
         reportsList.forEach { buildTestCaseReport(it) }
