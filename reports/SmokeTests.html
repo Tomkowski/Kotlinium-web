@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SmokeTests</title>
+</head>
+<script>
+    function init() {
+        var cases = document.getElementsByTagName("a")
+
+        function capitalise(string) {
+            return string[0].toUpperCase() + string.slice(1)
+        }
+
+        for (let i = 0; i < cases.length; i++) {
+            cases[i].innerText = capitalise(cases[i].innerText)
+        }
+    }
+</script>
+<style type="text/css">
+    .titlediv {
+        text-align: center;
+        border: 3px solid black;
+        border-top-right-radius: 25px;
+        border-top-left-radius: 25px;
+        background-color: #008080;
+        padding-top: 25px;
+        padding-bottom: 25px;
+        color: #FFF;
+        font-size: 32px;
+    }
+    a    {
+        outline: 0;
+        border: none;
+        text-decoration: none;
+        color: #FFFFFF;
+    }
+    ul{
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        border-radius: 2px;
+        cursor: pointer;
+        background: #7089ab;
+        border-width: 1px;
+        border-style: solid;
+        border-color: #800000;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+<body onload="init()">
+<div class="titlediv">
+    <a>Summary<br><b>SmokeTests</b></a>
+</div>
+<ul>
+    <li onclick="location.href='foo/report.html'"><a href='foo/report.html'>foo</a></li>
+</ul>
+</body>
+</html>

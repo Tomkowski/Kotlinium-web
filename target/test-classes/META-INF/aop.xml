@@ -1,0 +1,9 @@
+<aspectj>
+    <aspects>
+        <aspect name="aspects.PageAspect"/>
+    </aspects>
+    <weaver options="-verbose">
+        <include within="pages.*" />
+        <include within="aspects.PageAspect"/>
+    </weaver>
+</aspectj>

@@ -1,8 +1,13 @@
 package tests
 
-import org.junit.Test
-import tools.*
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
+import tools.Description
+import tools.Jira
+import tools.KotliniumTest
+import tools.googlePage
 
+@Tag("Demo")
 class DemoSet: KotliniumTest() {
     @Test
     @Jira("IDM-18564")
@@ -21,8 +26,7 @@ class DemoSet: KotliniumTest() {
         googlePage {
             `accept cookies`()
             `type search phrase`("Psy domowe")
-            `press enter on Search bar`()
-            `accept cookies`()
+         //   `press enter on Search bar`()
         }
     }
 }

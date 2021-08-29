@@ -1,5 +1,6 @@
 package tools
 
+import business.environmentURL
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.support.ui.WebDriverWait
@@ -7,25 +8,17 @@ import java.io.File
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.streams.asSequence
 
-fun Collection<Annotation>.findValue(annotation: String): Annotation? {
+lateinit var driver: ChromeDriver
+
+fun Array<Annotation>.findValue(annotation: String): Annotation? {
     return find { it.annotationClass.simpleName == annotation }
 }
 
 fun openPage(website: String) {
     driver.get(website).also {
-        WebDriverWait(driver, 60).until { driver.executeScript("return document.readyState").equals("complete") }
+        WebDriverWait(driver, 60).until { driver.executeScript("return document.readyState") == "complete" }
     }
-}
-
-val driver = run {
-    System.setProperty(
-        "webdriver.chrome.driver",
-        "./src/test/resources/chromedriver.exe"
-    )
-    val driverOptions = File("./src/test/resources/driver.properties").readLines().filter { !it.startsWith("#") }
-    val options = ChromeOptions().addArguments(driverOptions)
-    println(driverOptions)
-    ChromeDriver(options)
+    println("opened $environmentURL")
 }
 
 fun randomString(size: Int): String {
@@ -36,4 +29,11 @@ fun randomString(size: Int): String {
         .asSequence()
         .map(characters::get)
         .joinToString("")
+}
+
+fun File.mkSubDirs(){
+    with(this.path){
+        //file separator is either '/' or '\', but is received as String. [0] to get char.
+        File(substring(0, indexOfLast { it == System.getProperty("file.separator")[0] })).mkdirs()
+    }
 }

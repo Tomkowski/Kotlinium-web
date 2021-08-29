@@ -7,13 +7,10 @@ import org.aspectj.lang.annotation.Aspect
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.TakesScreenshot
 import tools.driver
-import tools.watcher
+import tools.testName
 import java.io.File
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 // Added to screenshot name to avoid screenshot name duplication
@@ -26,8 +23,6 @@ private var counter = 0L
  * @return relative path to newly created screenshot
  */
 private fun getScreenshot(testName: String, stepName: String): String {
-    // 0 for current thread, 1 for getScreenshot, 2 for AspectJ call, 3 for ended method
-    //val screenshotName = (Thread.currentThread().stackTrace[3].methodName?: "").replace(" ", "_")
     val dateName = SimpleDateFormat("yyyyMMddhhmmss").format(Date())
     val ts = driver as TakesScreenshot
     val source = ts.getScreenshotAs(OutputType.FILE)
@@ -53,7 +48,7 @@ class PageAspect {
 
         val stepName = joinPoint.signature.name
         val methodArgs = joinPoint.args
-        val screenshotPath = getScreenshot(watcher.methodName, stepName)
+        val screenshotPath = getScreenshot(testName, stepName)
         val timestamp = System.currentTimeMillis()
 
         testCaseSteps.add(TestStepReport(stepName, methodArgs.map { it.toString() }, screenshotPath, timestamp))

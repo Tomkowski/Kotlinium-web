@@ -60,7 +60,7 @@ object ReportBuilder {
     }
 
     fun generateReportSummary(testSetName: String) {
-        val jsonReport = File("./reports/$testSetName.json")
+        val jsonReport = File("./reports/json/$testSetName.json")
         val listType = object : TypeToken<ArrayList<TestCaseReport?>?>() {}.type
         val reportsList = Gson().fromJson<List<TestCaseReport>>(jsonReport.readText(), listType)
 

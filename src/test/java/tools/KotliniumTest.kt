@@ -4,39 +4,34 @@ import aspects.testCaseSteps
 import business.environmentURL
 import com.google.gson.Gson
 import model.TestCaseReport
-import org.junit.*
-import org.junit.rules.TestWatcher
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.extension.TestWatcher
+import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
 import java.io.File
 
 
 annotation class Jira(val id: String = "")
 annotation class Description(val text: String = "")
 
-lateinit var watcher: KotliniumTest.MyWatcher
+//name of currently run test
+//used in AspectJ for screenshot naming
+lateinit var testName: String
 private val reportsGenerated = mutableListOf<TestCaseReport>()
 
 abstract class KotliniumTest {
 
-    class MyWatcher : TestWatcher() {
-        lateinit var annotations: Collection<Annotation>
-        lateinit var methodName: String
-        lateinit var testSetName: String
-        override fun starting(description: org.junit.runner.Description?) {
-            annotations = description?.annotations ?: emptyList()
-            methodName = description?.methodName ?: ""
-            //tests.RegressionSet -> RegressionSet
-            testSetName = description?.className?.split(".")?.get(1) ?: ""
-        }
-
-        override fun succeeded(description: org.junit.runner.Description?) {
-            super.succeeded(description)
+    class MyWatcher : TestWatcher {
+        override fun testSuccessful(context: ExtensionContext?) {
+            super.testSuccessful(context)
             setStackTrace("")
         }
 
-        override fun failed(e: Throwable?, description: org.junit.runner.Description?) {
-            super.failed(e, description)
-            e?.let {
-                setStackTrace("<b>${e.message}</b><br>${e.stackTrace?.joinToString("<br>")}")
+        override fun testFailed(context: ExtensionContext?, cause: Throwable?) {
+            super.testFailed(context, cause)
+            cause?.let {
+                setStackTrace("<b>${cause.message}</b><br>${cause.stackTrace?.joinToString("<br>")}")
             }
         }
 
@@ -45,22 +40,19 @@ abstract class KotliniumTest {
         }
     }
 
-    @Before
-    fun setUp() {
-        File("./reports/${watcher.methodName}").deleteRecursively()
+    @BeforeEach
+    fun setUp(testInfo: TestInfo) {
+        testName = testInfo.testMethod.get().name
         openPage(environmentURL)
     }
 
-    // set watcher globally - used in AspectJ for screenshot naming
-    @Rule
-    @JvmField
-    val testName = MyWatcher().also { watcher = it }
-
-    @After
-    fun after() {
-        val methodName = watcher.methodName
-        val jiraId = watcher.annotations.findValue("Jira")?.let { (it as Jira).id } ?: "No Jira ID specified"
-        val description = watcher.annotations.findValue("Description")?.let { (it as Description).text } ?: ""
+    @AfterEach
+    fun after(testInfo: TestInfo) {
+        val methodName = testInfo.testMethod.get().name
+        val jiraId =
+            testInfo.testMethod.get().annotations.findValue("Jira")?.let { (it as Jira).id } ?: "No Jira ID specified"
+        val description =
+            testInfo.testMethod.get().annotations.findValue("Description")?.let { (it as Description).text } ?: methodName
 
         // copy of testCaseSteps has to be sent to avoid clearing it
         reportsGenerated.add(TestCaseReport(jiraId, methodName, description, testCaseSteps.toList()))
@@ -72,22 +64,37 @@ abstract class KotliniumTest {
 
     companion object {
 
-        @BeforeClass
+        @BeforeAll
         @JvmStatic
         fun init() {
-            File("./reports/").deleteRecursively()
+            driver = run {
+                val driverOptions = with(File("./src/test/resources/driver.properties")) {
+                    if (exists()) readLines().filter { !it.startsWith("#") }
+                    else emptyList()
+                }
+                val options = ChromeOptions().addArguments(driverOptions)
+                println(driverOptions)
+                ChromeDriver(options)
+            }
+            //File("./reports/").deleteRecursively()
         }
 
-        @AfterClass
+        @AfterAll
         @JvmStatic
-        fun generateSummary() {
-            println("Done all tests: ${watcher.testSetName}")
+        fun generateSummary(testInfo: TestInfo) {
+            //split by '.' and get last "java.test.SmokeTests" -> "SmokeTests"
+            val testSetName = testInfo.testClass.get().name.split(".").last()
+            println("Done all tests: $testSetName")
             driver.quit()
 
-            val jsonOutput = File("./reports/${watcher.testSetName}.json").apply { delete() }
+            val jsonOutput = File("./reports/json/$testSetName.json").apply{
+                delete()
+                mkSubDirs()
+            }
             jsonOutput.writeText(Gson().toJson(reportsGenerated))
 
-            ReportBuilder.generateReportSummary(watcher.testSetName)
+            ReportBuilder.generateReportSummary(testSetName)
+            reportsGenerated.clear()
         }
     }
 }
