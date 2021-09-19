@@ -4,6 +4,7 @@
     </aspects>
     <weaver options="-verbose">
         <include within="pages.*" />
+        <include within="tests.*" />
         <include within="aspects.PageAspect"/>
     </weaver>
 </aspectj>

@@ -74,7 +74,7 @@ object ReportBuilder {
             reportSummary.writeText(refactor)
         }
         reportsList.forEach { buildTestCaseReport(it) }
-        println("Summary available at: ${reportSummary.absolutePath}")
+        logger.info("Summary available at: ${reportSummary.absolutePath}")
     }
 
     private fun buildSummaryTestCaseRow(testCaseReport: TestCaseReport): String {

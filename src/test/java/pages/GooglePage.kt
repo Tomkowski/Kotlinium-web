@@ -10,6 +10,6 @@ class GooglePage : PageObjectIDM() {
 
     fun `accept cookies`() = acceptButton.click()
     fun `type search phrase`(phrase: String) = searchBar.sendKeys(phrase)
-    fun `press search buton`() = searchButton.click()
+    fun `press 'search' button`() = searchButton.click()
     fun `press enter on Search bar`() = searchBar.sendKeys(Keys.RETURN)
 }

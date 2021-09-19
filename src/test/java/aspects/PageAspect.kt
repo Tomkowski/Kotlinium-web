@@ -4,9 +4,11 @@ import model.TestStepReport
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.After
 import org.aspectj.lang.annotation.Aspect
+import org.aspectj.lang.annotation.Before
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.TakesScreenshot
 import tools.driver
+import tools.logger
 import tools.testName
 import java.io.File
 import java.text.SimpleDateFormat
@@ -26,11 +28,16 @@ private fun getScreenshot(testName: String, stepName: String): String {
     val dateName = SimpleDateFormat("yyyyMMddhhmmss").format(Date())
     val ts = driver as TakesScreenshot
     val source = ts.getScreenshotAs(OutputType.FILE)
-    val screenshotName = "$stepName$dateName-$counter.png".also { counter += 1 }
+    val screenshotName = normalizeScreenshotName("$stepName$dateName-$counter.png").also { counter += 1 }
     val destination = "./reports/$testName/$screenshotName"
     val finalDestination = File(destination)
     source.copyTo(finalDestination)
     return screenshotName
+}
+
+private fun normalizeScreenshotName(name: String): String {
+    return name.replace("(['\"<>:])".toRegex(), "_")
+        .replace("&#", "& #")
 }
 
 //list of <li> rows representing each step
@@ -52,6 +59,13 @@ class PageAspect {
         val timestamp = System.currentTimeMillis()
 
         testCaseSteps.add(TestStepReport(stepName, methodArgs.map { it.toString() }, screenshotPath, timestamp))
+    }
+
+    @Before("execution(void tests.*.*(..))")
+    fun createTestName(joinPoint: JoinPoint) {
+        logger.info("${joinPoint.signature.name} test was run")
+        testName =
+            joinPoint.signature.name + if (joinPoint.args.isNotEmpty()) "- ${joinPoint.args.joinToString(" ") { "[$it]" }}" else ""
     }
 }
 

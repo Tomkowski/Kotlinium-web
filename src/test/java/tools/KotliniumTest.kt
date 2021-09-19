@@ -5,10 +5,15 @@ import business.environmentURL
 import com.google.gson.Gson
 import model.TestCaseReport
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.TestWatcher
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxOptions
+import org.openqa.selenium.opera.OperaDriver
+import org.openqa.selenium.opera.OperaOptions
 import java.io.File
 
 
@@ -20,7 +25,9 @@ annotation class Description(val text: String = "")
 lateinit var testName: String
 private val reportsGenerated = mutableListOf<TestCaseReport>()
 
-abstract class KotliniumTest {
+@ExtendWith(KotliniumTest.MyWatcher::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+abstract class KotliniumTest() {
 
     class MyWatcher : TestWatcher {
         override fun testSuccessful(context: ExtensionContext?) {
@@ -31,7 +38,7 @@ abstract class KotliniumTest {
         override fun testFailed(context: ExtensionContext?, cause: Throwable?) {
             super.testFailed(context, cause)
             cause?.let {
-                setStackTrace("<b>${cause.message}</b><br>${cause.stackTrace?.joinToString("<br>")}")
+                setStackTrace("<b>${cause.message}<br>${cause.cause}</b><br>${cause.stackTrace?.joinToString("<br>")}")
             }
         }
 
@@ -42,59 +49,59 @@ abstract class KotliniumTest {
 
     @BeforeEach
     fun setUp(testInfo: TestInfo) {
-        testName = testInfo.testMethod.get().name
         openPage(environmentURL)
     }
 
     @AfterEach
     fun after(testInfo: TestInfo) {
-        val methodName = testInfo.testMethod.get().name
         val jiraId =
             testInfo.testMethod.get().annotations.findValue("Jira")?.let { (it as Jira).id } ?: "No Jira ID specified"
         val description =
-            testInfo.testMethod.get().annotations.findValue("Description")?.let { (it as Description).text } ?: methodName
+            testInfo.testMethod.get().annotations.findValue("Description")?.let { (it as Description).text }
+                ?: testName
 
         // copy of testCaseSteps has to be sent to avoid clearing it
-        reportsGenerated.add(TestCaseReport(jiraId, methodName, description, testCaseSteps.toList()))
+        reportsGenerated.add(TestCaseReport(jiraId, testName, description, testCaseSteps.toList()))
         // clear already added steps
         testCaseSteps.clear()
         //reset browser
         driver.manage().deleteAllCookies()
     }
 
-    companion object {
 
-        @BeforeAll
-        @JvmStatic
-        fun init() {
-            driver = run {
-                val driverOptions = with(File("./src/test/resources/driver.properties")) {
-                    if (exists()) readLines().filter { !it.startsWith("#") }
-                    else emptyList()
-                }
-                val options = ChromeOptions().addArguments(driverOptions)
-                println(driverOptions)
-                ChromeDriver(options)
+    @BeforeAll
+    fun init() {
+        driver = run {
+            val driverOptions = with(File("./src/test/resources/driver.properties")) {
+                if (exists()) readLines().filter { !it.startsWith("#") }
+                else emptyList()
             }
-            //File("./reports/").deleteRecursively()
-        }
-
-        @AfterAll
-        @JvmStatic
-        fun generateSummary(testInfo: TestInfo) {
-            //split by '.' and get last "java.test.SmokeTests" -> "SmokeTests"
-            val testSetName = testInfo.testClass.get().name.split(".").last()
-            println("Done all tests: $testSetName")
-            driver.quit()
-
-            val jsonOutput = File("./reports/json/$testSetName.json").apply{
-                delete()
-                mkSubDirs()
+            val options = ChromeOptions().addArguments(driverOptions)
+            logger.info("$driverOptions")
+            return@run when (System.getProperty("webdriver.type")) {
+                "chrome" -> ChromeDriver(ChromeOptions().addArguments(driverOptions))
+                "firefox" -> FirefoxDriver(FirefoxOptions().addArguments(driverOptions))
+                "opera" -> OperaDriver(OperaOptions().addArguments(driverOptions))
+                else -> ChromeDriver(ChromeOptions().addArguments(driverOptions))
             }
-            jsonOutput.writeText(Gson().toJson(reportsGenerated))
-
-            ReportBuilder.generateReportSummary(testSetName)
-            reportsGenerated.clear()
         }
+        //File("./reports/").deleteRecursively()
+    }
+
+    @AfterAll
+    fun generateSummary(testInfo: TestInfo) {
+        //split by '.' and get last "java.test.SmokeTests" -> "SmokeTests"
+        val testSetName = testInfo.testClass.get().name.split(".").last()
+        logger.info("Done all tests: $testSetName")
+        driver.quit()
+
+        val jsonOutput = File("./reports/json/$testSetName.json").apply {
+            delete()
+            mkSubDirs()
+        }
+        jsonOutput.writeText(Gson().toJson(reportsGenerated))
+
+        ReportBuilder.generateReportSummary(testSetName)
+        reportsGenerated.clear()
     }
 }
