@@ -1,5 +1,6 @@
 package tools
 
+import aspects.getScreenshot
 import aspects.testCaseSteps
 import business.environmentURL
 import com.google.gson.Gson
@@ -25,11 +26,11 @@ annotation class Description(val text: String = "")
 lateinit var testName: String
 private val reportsGenerated = mutableListOf<TestCaseReport>()
 
-@ExtendWith(KotliniumTest.MyWatcher::class)
+@ExtendWith(KotliniumTest.KotliniumWatcher::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class KotliniumTest() {
 
-    class MyWatcher : TestWatcher {
+    class KotliniumWatcher : TestWatcher {
         override fun testSuccessful(context: ExtensionContext?) {
             super.testSuccessful(context)
             setStackTrace("")
@@ -40,7 +41,13 @@ abstract class KotliniumTest() {
             cause?.let {
                 setStackTrace("<b>${cause.message}<br>${cause.cause}</b><br>${cause.stackTrace?.joinToString("<br>")}")
             }
+            if(System.getProperty("screenshot.strategy") == "on fail"){
+                with(reportsGenerated.last().stepsList.last()){
+                    screenshotPath = getScreenshot(testName, stepName)
+                }
+            }
         }
+
 
         private fun setStackTrace(message: String) {
             reportsGenerated.last().stackTrace = message
@@ -72,12 +79,13 @@ abstract class KotliniumTest() {
     @BeforeAll
     fun init() {
         driver = run {
+            //get all driver options specified in driver.properties file. Ignore lines starting with '#'
             val driverOptions = with(File("./src/test/resources/driver.properties")) {
                 if (exists()) readLines().filter { !it.startsWith("#") }
                 else emptyList()
             }
-            val options = ChromeOptions().addArguments(driverOptions)
             logger.info("$driverOptions")
+            //return web driver as specified in driver.properties file. Default is Chrome.
             return@run when (System.getProperty("webdriver.type")) {
                 "chrome" -> ChromeDriver(ChromeOptions().addArguments(driverOptions))
                 "firefox" -> FirefoxDriver(FirefoxOptions().addArguments(driverOptions))
@@ -85,7 +93,6 @@ abstract class KotliniumTest() {
                 else -> ChromeDriver(ChromeOptions().addArguments(driverOptions))
             }
         }
-        //File("./reports/").deleteRecursively()
     }
 
     @AfterAll
@@ -94,7 +101,7 @@ abstract class KotliniumTest() {
         val testSetName = testInfo.testClass.get().name.split(".").last()
         logger.info("Done all tests: $testSetName")
         driver.quit()
-
+        // delete existing one (from previous Test Set execution) and create new in the same place.
         val jsonOutput = File("./reports/json/$testSetName.json").apply {
             delete()
             mkSubDirs()

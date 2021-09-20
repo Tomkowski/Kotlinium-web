@@ -5,4 +5,5 @@ data class TestCaseReport(
     val testCaseName: String,
     val description: String,
     val stepsList: List<TestStepReport>,
-    var stackTrace: String = "")
+    var stackTrace: String = ""
+)

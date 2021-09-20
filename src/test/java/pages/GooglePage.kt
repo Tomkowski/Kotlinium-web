@@ -1,6 +1,7 @@
 package pages
 
 import org.openqa.selenium.Keys
+import org.openqa.selenium.support.ui.ExpectedConditions
 import tools.PageObjectIDM
 
 class GooglePage : PageObjectIDM() {

@@ -5,15 +5,22 @@ import org.openqa.selenium.NoSuchElementException
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.ui.FluentWait
 import java.time.Duration
-import kotlin.properties.ReadWriteProperty
+import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 open class PageObjectIDM {
+    //create a FluentWait object with default timeout time of 10 seconds
     val wait = FluentWait(driver)
-        .withTimeout(Duration.ofSeconds(10))
+        .withTimeout(Duration.ofSeconds(System.getProperty("wait.timeout")?.toLong()?: 10L))
         .pollingEvery(Duration.ofMillis(200))
         .ignoring(NoSuchElementException::class.java)
 
+    /**
+     * Wait for a rule to apply and then returns WebElement
+     * @param by - Locator by which the WebElement will be found
+     * @param rule - boolean function which specify when element should be returned.
+     * @return WebElement under specific WebElement
+     */
     fun WebElement.waitForElement(by: By, rule: (WebElement) -> Boolean = {true}): WebElement{
         wait.until { rule(this.findElement(by)) }
         return this.findElement(by)
@@ -22,29 +29,32 @@ open class PageObjectIDM {
         wait.until { rule(this.findElements(by)) }
         return this.findElements(by)
     }
-    fun `wait until page is loaded`() {
-        wait.until {
-            with(driver.findElements(By.xpath(".//div[@class='nanobar']/child::div"))) {
-                return@until size == 1 && this[0].getCssValue("width") == "0px"
-            }
-        }
-    }
 
-    abstract inner class Locator(
+    fun `wait until page is loaded`(){}
+    /**
+     * Delegate which returns a WebElements
+     * @param locator - function which takes path or and ID of a WebElement and returns its By form
+     * @param path - path by which WebElement is found later
+     * @param accessRule - rule which has to be fulfilled before WebElement is returned. True by default (always return)
+     */
+    abstract inner  class Locator(
         private val locator: (String) -> By,
         private val path: String,
         private val accessRule: (WebElement) -> Boolean = { true }
-    ) : ReadWriteProperty<Any?, WebElement> {
+    ) : ReadOnlyProperty<Any?, WebElement> {
         private val element: WebElement by lazy {
             wait.until { driver.findElement(locator(path)) }
         }
 
+        /**
+         * Evaluates webElement and returns it. Varying on kotlinium.static property it can be evaluated lazily only once
+         * or be evaluated over and over again after each call to the WebElement
+         * @return webElement specified by a locator and path properties
+         */
         override fun getValue(thisRef: Any?, property: KProperty<*>): WebElement {
-            wait.until { accessRule(element) }
-            return element
-        }
-
-        override fun setValue(thisRef: Any?, property: KProperty<*>, value: WebElement) {
+            val webElement = if(System.getProperty("kotlinium.static") == "true") element else wait.until { driver.findElement(locator(path)) }
+            wait.until { accessRule(webElement) }
+            return webElement
         }
     }
 

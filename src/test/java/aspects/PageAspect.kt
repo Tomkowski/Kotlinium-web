@@ -24,7 +24,7 @@ private var counter = 0L
  * Takes screenshot of the currently finished step
  * @return relative path to newly created screenshot
  */
-private fun getScreenshot(testName: String, stepName: String): String {
+fun getScreenshot(testName: String, stepName: String): String {
     val dateName = SimpleDateFormat("yyyyMMddhhmmss").format(Date())
     val ts = driver as TakesScreenshot
     val source = ts.getScreenshotAs(OutputType.FILE)
@@ -54,18 +54,21 @@ class PageAspect {
         if (!isInvokedByTestCase()) return
 
         val stepName = joinPoint.signature.name
-        val methodArgs = joinPoint.args
-        val screenshotPath = getScreenshot(testName, stepName)
+        val methodArgs = joinPoint.args.map { it.toString() }
+        val screenshotPath = if(System.getProperty("screenshot.strategy").trim().lowercase() == "always") getScreenshot(testName, stepName) else ""
         val timestamp = System.currentTimeMillis()
-
-        testCaseSteps.add(TestStepReport(stepName, methodArgs.map { it.toString() }, screenshotPath, timestamp))
+        testCaseSteps.add(TestStepReport(stepName, methodArgs, screenshotPath, timestamp))
+        logger.info("Finished step: $stepName - $methodArgs")
     }
-
+    /**
+     * Creates name of currently run test case. Adds arguments' values to the test case name if it has any.
+     * @param joinPoint - reference to a method for which the function is called
+     */
     @Before("execution(void tests.*.*(..))")
     fun createTestName(joinPoint: JoinPoint) {
-        logger.info("${joinPoint.signature.name} test was run")
         testName =
             joinPoint.signature.name + if (joinPoint.args.isNotEmpty()) "- ${joinPoint.args.joinToString(" ") { "[$it]" }}" else ""
+        logger.info("$testName is now being run.")
     }
 }
 

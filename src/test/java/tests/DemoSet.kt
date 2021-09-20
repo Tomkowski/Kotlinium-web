@@ -10,7 +10,7 @@ import tools.KotliniumTest
 import tools.googlePage
 
 @Tag("Demo")
-class DemoSet: KotliniumTest() {
+class DemoSet : KotliniumTest() {
     @Jira("IDM-18564")
     @Description("When phrase is entered and Search button is pressed, then Google yields some results")
     @ParameterizedTest
@@ -19,9 +19,10 @@ class DemoSet: KotliniumTest() {
         googlePage {
             `accept cookies`()
             `type search phrase`("Psy domowe")
-            `press 'search' button`()
+            `press enter on Search bar`()
         }
     }
+
     @Test
     @Jira("IDM-18564")
     @Description("When phrase is entered and enter key is pressed, then Google yields some results")
@@ -29,7 +30,7 @@ class DemoSet: KotliniumTest() {
         googlePage {
             `accept cookies`()
             `type search phrase`("Psy domowe")
-         //   `press enter on Search bar`()
+            `press 'search' button`()
         }
     }
 }
