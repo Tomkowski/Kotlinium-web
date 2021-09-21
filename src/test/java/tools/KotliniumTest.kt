@@ -4,6 +4,8 @@ import aspects.getScreenshot
 import aspects.testCaseSteps
 import business.environmentURL
 import com.google.gson.Gson
+import model.Description
+import model.Jira
 import model.TestCaseReport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,10 +18,6 @@ import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.opera.OperaDriver
 import org.openqa.selenium.opera.OperaOptions
 import java.io.File
-
-
-annotation class Jira(val id: String = "")
-annotation class Description(val text: String = "")
 
 //name of currently run test
 //used in AspectJ for screenshot naming

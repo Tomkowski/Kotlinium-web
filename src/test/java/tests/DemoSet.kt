@@ -1,11 +1,11 @@
 package tests
 
+import model.Description
+import model.Jira
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import tools.Description
-import tools.Jira
 import tools.KotliniumTest
 import tools.googlePage
 

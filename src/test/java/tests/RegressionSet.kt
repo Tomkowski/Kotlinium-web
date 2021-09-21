@@ -1,7 +1,12 @@
 package tests
 
+import model.Description
+import model.Jira
 import org.junit.jupiter.api.Test
-import tools.*
+import tools.KotliniumTest
+import tools.createNewDocument
+import tools.loginPage
+import tools.myDocuments
 
 
 class RegressionSet: KotliniumTest(){

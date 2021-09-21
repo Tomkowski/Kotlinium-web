@@ -1,12 +1,15 @@
 package pages
 
+import model.Static
 import org.openqa.selenium.Keys
 import org.openqa.selenium.support.ui.ExpectedConditions
 import tools.PageObjectIDM
 
 class GooglePage : PageObjectIDM() {
+    @Static
     private val acceptButton by Xpath(".//div[@class='KxvlWc']//button[contains(string(), 'agree')]")
     private val searchBar by Xpath(".//input[@title='Search']")
+    @Static
     private val searchButton by Xpath(".//div[@class='UUbT9']//input[@value='Google Search']")
 
     fun `accept cookies`() = acceptButton.click()
