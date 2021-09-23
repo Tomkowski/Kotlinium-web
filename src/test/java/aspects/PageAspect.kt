@@ -1,13 +1,16 @@
 package aspects
 
+import model.DisplayName
 import model.TestStepReport
 import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.After
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
+import org.aspectj.lang.reflect.MethodSignature
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.TakesScreenshot
 import tools.driver
+import tools.findValue
 import tools.logger
 import tools.testName
 import java.io.File
@@ -36,8 +39,7 @@ fun getScreenshot(testName: String, stepName: String): String {
 }
 
 private fun normalizeScreenshotName(name: String): String {
-    return name.replace("(['\"<>:])".toRegex(), "_")
-        .replace("&#", "& #")
+    return name.replace("(['\"<>:/#&])".toRegex(), "_")
 }
 
 //list of <li> rows representing each step
@@ -57,7 +59,8 @@ class PageAspect {
         val methodArgs = joinPoint.args.map { it.toString() }
         val screenshotPath = if(System.getProperty("screenshot.strategy").trim().lowercase() == "always") getScreenshot(testName, stepName) else ""
         val timestamp = System.currentTimeMillis()
-        testCaseSteps.add(TestStepReport(stepName, methodArgs, screenshotPath, timestamp))
+        val displayName = (joinPoint.signature as MethodSignature).method.annotations.findValue(DisplayName::class)?.let{ (it as DisplayName).name}?: ""
+        testCaseSteps.add(TestStepReport(stepName, methodArgs, screenshotPath, timestamp, displayName))
         logger.info("Finished step: $stepName - $methodArgs")
     }
     /**
@@ -67,7 +70,7 @@ class PageAspect {
     @Before("execution(void tests.*.*(..))")
     fun createTestName(joinPoint: JoinPoint) {
         testName =
-            joinPoint.signature.name + if (joinPoint.args.isNotEmpty()) "- ${joinPoint.args.joinToString(" ") { "[$it]" }}" else ""
+            joinPoint.signature.name + if (joinPoint.args.isNotEmpty()) " - ${joinPoint.args.joinToString(" ") { "[$it]" }}" else ""
         logger.info("$testName is now being run.")
     }
 }

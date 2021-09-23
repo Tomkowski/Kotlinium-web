@@ -1,9 +1,11 @@
 package tools
 
+import model.Invisible
 import model.Static
 import org.openqa.selenium.By
 import org.openqa.selenium.NoSuchElementException
 import org.openqa.selenium.WebElement
+import org.openqa.selenium.support.ui.ExpectedConditions
 import org.openqa.selenium.support.ui.FluentWait
 import java.time.Duration
 import kotlin.properties.ReadOnlyProperty
@@ -56,29 +58,33 @@ open class PageObjectIDM {
          */
         override fun getValue(thisRef: Any?, property: KProperty<*>): WebElement {
             val isStaticAnnotationAvailable =
-                property.annotations.find { it.annotationClass == Static::class} != null
+                property.annotations.find { it.annotationClass == Static::class } != null
+            val isInvisibleAnnotationAvailable =
+                property.annotations.find { it.annotationClass == Invisible::class } != null
 
             val webElement =
                 if (isStaticAnnotationAvailable || System.getProperty("kotlinium.static") == "true") element else wait.until {
                     driver.findElement(locator(path))
                 }
-            wait.until { accessRule(webElement) }
+            if (!isInvisibleAnnotationAvailable) {
+                wait.until { accessRule(webElement) }
+            }
             return webElement
         }
     }
 
     inner class Xpath(
         path: String,
-        accessRule: (WebElement) -> Boolean = { true }
+        accessRule: (WebElement) -> Boolean = { it.isDisplayed }
     ) : Locator(By::xpath, path, accessRule)
 
     inner class CssSelector(
         path: String,
-        accessRule: (WebElement) -> Boolean = { true }
+        accessRule: (WebElement) -> Boolean = { it.isDisplayed }
     ) : Locator(By::cssSelector, path, accessRule)
 
     inner class Id(
         id: String,
-        accessRule: (WebElement) -> Boolean = { true }
+        accessRule: (WebElement) -> Boolean = { it.isDisplayed }
     ) : Locator(By::id, id, accessRule)
 }

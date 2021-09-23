@@ -9,13 +9,13 @@
         let cases = document.getElementsByTagName("a");
 
         function capitalise(string) {
-            return string[0].toUpperCase() + string.slice(1).split("[")[0]
+            return string[0].toUpperCase() + string.slice(1);
         }
 
         for (let i = 0; i < cases.length; i++) {
-            let text = cases[i].innerText;
+            let text = cases[i].innerHTML.trim();
             if(text == null || text === "") continue;
-            cases[i].firstChild.data = capitalise(text)
+            cases[i].innerHTML = capitalise(text)
         }
     }
 </script>

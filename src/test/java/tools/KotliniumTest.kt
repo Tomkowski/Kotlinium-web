@@ -39,7 +39,7 @@ abstract class KotliniumTest() {
             cause?.let {
                 setStackTrace("<b>${cause.message}<br>${cause.cause}</b><br>${cause.stackTrace?.joinToString("<br>")}")
             }
-            if(System.getProperty("screenshot.strategy") == "on fail"){
+            if(System.getProperty("screenshot.strategy") == "on-fail"){
                 with(reportsGenerated.last().stepsList.last()){
                     screenshotPath = getScreenshot(testName, stepName)
                 }
@@ -60,9 +60,9 @@ abstract class KotliniumTest() {
     @AfterEach
     fun after(testInfo: TestInfo) {
         val jiraId =
-            testInfo.testMethod.get().annotations.findValue("Jira")?.let { (it as Jira).id } ?: "No Jira ID specified"
+            testInfo.testMethod.get().annotations.findValue(Jira::class)?.let { (it as Jira).id } ?: "No Jira ID specified"
         val description =
-            testInfo.testMethod.get().annotations.findValue("Description")?.let { (it as Description).text }
+            testInfo.testMethod.get().annotations.findValue(Description::class)?.let { (it as Description).text }
                 ?: testName
 
         // copy of testCaseSteps has to be sent to avoid clearing it

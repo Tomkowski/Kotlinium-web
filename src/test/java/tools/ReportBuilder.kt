@@ -19,13 +19,22 @@ object ReportBuilder {
         fun buildElement(testStepReport: TestStepReport): String {
             with(testStepReport) {
                 val formattedParameters = stepParameters.joinToString(" ") { "[$it]" }
+                val rowOutput =
+                    if (displayName.isEmpty()) "$stepName <span style=\"color: #164694\">$formattedParameters</span>" else {
+                        stepParameters.fold(displayName) { sum, arg ->
+                            sum.replaceFirst(
+                                "%s",
+                                "<span style=\"color: #164694\">$arg</span>"
+                            )
+                        }
+                    }
                 val formattedTimestamp =
-                        SimpleDateFormat("MMM-dd-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(timestamp) ?: ""
+                    SimpleDateFormat("MMM-dd-yyyy HH:mm:ss.SSS", Locale.ENGLISH).format(timestamp) ?: ""
                 return """
                 <li> 
                     <div style="display: flex; align-items: center; justify-content: space-between">
                             <a style="height: 100%; padding-left: 10px;">
-                                $stepName <span style="color: #164694">$formattedParameters</span>
+                               $rowOutput
                             </a>
                             <a href='$screenshotPath'>
                                 <img src='$screenshotPath'/>
@@ -56,10 +65,10 @@ object ReportBuilder {
 
             reportSummary.readText().apply {
                 val refactor = replace("%title%", testCaseName)
-                        .replace("%jiraticket%", jiraID)
-                        .replace("%description%", description)
-                        .replace("%report%", stepsList.joinToString(separator = "\n") { buildStepReport(it) })
-                        .replace("%stacktrace%", stackTrace)
+                    .replace("%jiraticket%", jiraID)
+                    .replace("%description%", description)
+                    .replace("%report%", stepsList.joinToString(separator = "\n") { buildStepReport(it) })
+                    .replace("%stacktrace%", stackTrace)
 
                 reportSummary.writeText(refactor)
             }
@@ -84,7 +93,7 @@ object ReportBuilder {
         //replace all placeholders with actual data from JSON file.
         reportSummary.readText().apply {
             val refactor = replace("%title%", testSetName)
-                    .replace("%summary%", reportsList.joinToString(separator = "\n") { buildSummaryTestCaseRow(it) })
+                .replace("%summary%", reportsList.joinToString(separator = "\n") { buildSummaryTestCaseRow(it) })
             reportSummary.writeText(refactor)
         }
         reportsList.forEach { buildTestCaseReport(it) }
