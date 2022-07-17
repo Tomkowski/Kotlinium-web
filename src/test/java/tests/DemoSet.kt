@@ -18,7 +18,7 @@ class DemoSet : KotliniumTest() {
     fun `user can search for words and press button to search`(username: String, role: String) {
         googlePage {
             `accept cookies`()
-            `type search phrase`("Psy domowe")
+            `type search phrase`("$username as $role")
             `press enter on Search bar`()
         }
     }

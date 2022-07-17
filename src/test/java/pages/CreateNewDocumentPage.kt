@@ -1,7 +1,6 @@
 package pages
 
 import org.openqa.selenium.By
-import org.openqa.selenium.Keys
 import org.openqa.selenium.NoSuchElementException
 import org.openqa.selenium.WebElement
 import tools.PageObjectIDM

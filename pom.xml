@@ -26,6 +26,8 @@
                         <include>tests/**</include>
                     </includes>
                     <groups>${tests}</groups>
+                    <parallel>methods</parallel>
+                    <threadCount>2</threadCount>
                 </configuration>
             </plugin>
             <plugin>
@@ -86,13 +88,18 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.0-RC1</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-engine</artifactId>
             <version>1.8.0-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>5.2.0</version>
         </dependency>
     </dependencies>
 </project>

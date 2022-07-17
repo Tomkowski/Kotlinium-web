@@ -8,10 +8,10 @@ import tools.PageObjectIDM
 
 class GooglePage : PageObjectIDM() {
     @Static
-    private val acceptButton by Xpath(".//div[@class='KxvlWc']//button[contains(string(), 'agree')]")
+    private val acceptButton by Xpath("//*[@id=\"L2AGLb\"]/div")
     private val searchBar by Xpath(".//input[@title='Search']")
     @Static
-    private val searchButton by Xpath(".//div[@class='UUbT9']//input[@value='Google Search']")
+    private val searchButton by Xpath(".//div[@class = 'FPdoLc lJ9FBc']//input[@value='Google Search']")
 
     fun `accept cookies`() = acceptButton.click()
     @DisplayName("user types %s in search box")

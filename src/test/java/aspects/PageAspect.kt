@@ -9,10 +9,7 @@ import org.aspectj.lang.annotation.Before
 import org.aspectj.lang.reflect.MethodSignature
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.TakesScreenshot
-import tools.driver
-import tools.findValue
-import tools.logger
-import tools.testName
+import tools.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,9 +39,6 @@ private fun normalizeScreenshotName(name: String): String {
     return name.replace("(['\"<>:/#&])".toRegex(), "_")
 }
 
-//list of <li> rows representing each step
-val testCaseSteps = mutableListOf<TestStepReport>()
-
 @Aspect
 class PageAspect {
 
@@ -69,7 +63,7 @@ class PageAspect {
      */
     @Before("execution(void tests.*.*(..))")
     fun createTestName(joinPoint: JoinPoint) {
-        testName =
+        testNameMap[Thread.currentThread().name.also { logger.info("Setting up testNameMap for $it") }] =
             joinPoint.signature.name + if (joinPoint.args.isNotEmpty()) " - ${joinPoint.args.joinToString(" ") { "[$it]" }}" else ""
         logger.info("$testName is now being run.")
     }

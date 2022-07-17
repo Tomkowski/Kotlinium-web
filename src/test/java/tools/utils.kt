@@ -1,6 +1,8 @@
 package tools
 
 import business.environmentURL
+import model.TestCaseReport
+import model.TestStepReport
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
@@ -11,18 +13,34 @@ import java.util.logging.Logger
 import kotlin.reflect.KClass
 import kotlin.streams.asSequence
 
-lateinit var driver: WebDriver
-val logger: Logger = Logger.getLogger(KotliniumTest::class.simpleName)
+val driverMap = mutableMapOf<String, WebDriver>()
+val driver: WebDriver
+get() = driverMap[Thread.currentThread().name]?: throw IllegalArgumentException("WebDriver was not initialized for ${Thread.currentThread().name}")
+
+//name of currently run test
+//used in AspectJ for screenshot naming
+val testNameMap = mutableMapOf<String, String>()
+val testName: String
+get() = testNameMap[Thread.currentThread().name]?: throw IllegalArgumentException("Test name was not initialized for ${Thread.currentThread().name}")
+
+//list of <li> rows representing each step
+val testCaseStepsMap = mutableMapOf<String, MutableList<TestStepReport>>()
+val testCaseSteps: MutableList<TestStepReport>
+    get() = testCaseStepsMap[Thread.currentThread().name]?: throw IllegalArgumentException("Test step report was not initialized for ${Thread.currentThread().name}")
+
+val logger: Logger
+get() = Logger.getLogger(KotliniumTest::class.simpleName)
 
 fun Array<Annotation>.findValue(annotation: KClass<*>): Annotation? {
     return find { it.annotationClass == annotation }
 }
 
 fun openPage(website: String) {
-    driver.get(website).also {
+    driverMap[Thread.currentThread().name]!!.get(website).also {
         WebDriverWait(driver, 60).until { driver.executeScript("return document.readyState") == "complete" }
     }
-    logger.info("opened $environmentURL")
+    logger.info("opened: $environmentURL")
+    logger.info(Thread.currentThread().name)
 }
 
 fun randomString(size: Int): String {
